@@ -1,0 +1,50 @@
+####################################
+# Example LAMMPS input script      #
+# for a simple Lennard Jones fluid #
+####################################
+
+####################################
+# 1) Set up simulation box
+#   - We set a 3D periodic box
+#   - Our box has 10x10x10 atom 
+#     positions, evenly distributed
+#   - The atom starting sites are
+#     separated such that the box density
+#     is 0.6
+####################################
+variable energy equal etotal
+units		lj
+atom_style	atomic
+dimension	3
+boundary	p p p
+
+lattice		sc 0.60
+region		box block 0 10 0 10 0 10
+create_box	1 box
+create_atoms	1 box
+
+####################################
+# 2) Define interparticle interactions
+#   - Here, we use truncated & shifted LJ
+#   - All atoms of type 1 (in this case, all atoms)
+#     have a mass of 1.0
+####################################
+
+pair_style	lj/cut 3.5
+pair_modify	shift yes
+pair_coeff	1 1 1.0 1.0
+mass		1 1.0
+
+####################################
+# 3) Neighbour lists
+#   - Each atom will only consider neighbours
+#     within a distance of 2.8 of each other
+#   - The neighbour lists are recalculated
+#     every timestep
+####################################
+
+neighbor        0.3 bin
+neigh_modify    delay 10 every 1
+
+run 0
+print ${energy}

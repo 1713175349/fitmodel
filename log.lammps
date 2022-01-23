@@ -1,0 +1,104 @@
+LAMMPS (14 Dec 2021)
+OMP_NUM_THREADS environment is not set. Defaulting to 1 thread. (src/comm.cpp:98)
+  using 1 OpenMP thread(s) per MPI task
+####################################
+# Example LAMMPS input script      #
+# for a simple Lennard Jones fluid #
+####################################
+
+####################################
+# 1) Set up simulation box
+#   - We set a 3D periodic box
+#   - Our box has 10x10x10 atom
+#     positions, evenly distributed
+#   - The atom starting sites are
+#     separated such that the box density
+#     is 0.6
+####################################
+variable energy equal etotal
+units		lj
+atom_style	atomic
+dimension	3
+boundary	p p p
+
+lattice		sc 0.60
+Lattice spacing in x,y,z = 1.1856311 1.1856311 1.1856311
+region		box block 0 10 0 10 0 10
+create_box	1 box
+Created orthogonal box = (0 0 0) to (11.856311 11.856311 11.856311)
+  1 by 1 by 1 MPI processor grid
+create_atoms	1 box
+Created 1000 atoms
+  using lattice units in orthogonal box = (0 0 0) to (11.856311 11.856311 11.856311)
+  create_atoms CPU = 0.000 seconds
+
+####################################
+# 2) Define interparticle interactions
+#   - Here, we use truncated & shifted LJ
+#   - All atoms of type 1 (in this case, all atoms)
+#     have a mass of 1.0
+####################################
+
+pair_style	lj/cut 3.5
+pair_modify	shift yes
+pair_coeff	1 1 1.0 1.0
+mass		1 1.0
+
+####################################
+# 3) Neighbour lists
+#   - Each atom will only consider neighbours
+#     within a distance of 2.8 of each other
+#   - The neighbour lists are recalculated
+#     every timestep
+####################################
+
+neighbor        0.3 bin
+neigh_modify    delay 10 every 1
+
+run 0
+WARNING: No fixes with time integration, atoms won't move (src/verlet.cpp:60)
+  generated 0 of 0 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update every 1 steps, delay 10 steps, check yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 3.8
+  ghost atom cutoff = 3.8
+  binsize = 1.9, bins = 7 7 7
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.245 | 3.245 | 3.245 Mbytes
+Step Temp E_pair E_mol TotEng Press 
+       0            0    -4.208341            0    -4.208341   -3.2409761 
+Loop time of 1.913e-06 on 1 procs for 0 steps with 1000 atoms
+
+104.5% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0          | 0          | 0          |   0.0 |  0.00
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0          | 0          | 0          |   0.0 |  0.00
+Output  | 0          | 0          | 0          |   0.0 |  0.00
+Modify  | 0          | 0          | 0          |   0.0 |  0.00
+Other   |            | 1.913e-06  |            |       |100.00
+
+Nlocal:           1000 ave        1000 max        1000 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:           3913 ave        3913 max        3913 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:          73000 ave       73000 max       73000 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 73000
+Ave neighs/atom = 73
+Neighbor list builds = 0
+Dangerous builds = 0
+print ${energy}
+print -4.20834097360452
+-4.20834097360452
+Total wall time: 0:00:00

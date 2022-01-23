@@ -1,0 +1,23 @@
+jobname: "test"
+
+parameterset:
+  - name: "auaupair"
+    value: [1.1,1.2]
+    max: [1.5,1.3]
+    min: [0.5,0.3]
+    command:
+      lammps:
+        model_command: "pair_coeff 1 1 {0} {1}"
+
+comman_model: "command" #"file"模式表示输出到文件
+
+models:
+  - name: "s"
+    type: "lammps"
+    prein: "../in.lj"
+    #calculatein: "../in1"
+    weight: 1
+    result:
+      - value: -4.208341
+        command: "energy"
+        weight: 1
